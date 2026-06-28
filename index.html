@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>オーダースーツ 見積もりシミュレーター</title>
+<meta name="theme-color" content="#13213a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="お見積り">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2313213a'/><text x='32' y='45' font-size='34' text-anchor='middle'>%F0%9F%91%94</text></svg>">
+<style>
+  :root{
+    --navy:#13213a; --navy2:#1c3057; --gold:#c8a96a; --gold-d:#a8893f;
+    --bg:#f4f1ea; --card:#ffffff; --line:#e3ddcf; --ink:#23272e; --muted:#7a8190;
+    --ok:#2f7d54; --shadow:0 6px 24px rgba(19,33,58,.08);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  /* ---------- header ---------- */
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;
+    padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    position:sticky;top:0;z-index:30;box-shadow:var(--shadow)}
+  .brand{display:flex;align-items:center;gap:14px;min-width:0}
+  .logo{width:46px;height:46px;border:2px solid var(--gold);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto}
+  .brand h1{font-size:15px;margin:0;font-weight:700;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand .shop{font-size:12px;color:var(--gold);font-weight:600;cursor:pointer}
+  .brand .shop:hover{text-decoration:underline}
+  .gear{background:rgba(255,255,255,.12);border:none;color:#fff;font-size:13px;
+    padding:9px 14px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .gear:hover{background:rgba(255,255,255,.22)}
+  /* ---------- layout ---------- */
+  .wrap{display:grid;grid-template-columns:1fr 360px;gap:22px;max-width:1180px;margin:0 auto;padding:22px}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr;padding:16px 14px 120px}}
+  section.step{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:20px 20px 22px;margin-bottom:20px;box-shadow:var(--shadow)}
+  .steptag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+    color:var(--gold-d);letter-spacing:.08em;margin-bottom:4px}
+  .steptag b{background:var(--navy);color:#fff;width:22px;height:22px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  h2.t{font-size:19px;margin:2px 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+  /* ---------- scene cards ---------- */
+  .scenes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:680px){.scenes{grid-template-columns:repeat(2,1fr)}}
+  .scene{border:1.5px solid var(--line);border-radius:14px;padding:16px 12px;text-align:center;
+    cursor:pointer;background:#fff;transition:.15s;position:relative}
+  .scene:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .scene.on{border-color:var(--gold);background:#fbf7ee;box-shadow:0 0 0 3px rgba(200,169,106,.18)}
+  .scene .emj{font-size:30px;display:block;margin-bottom:6px}
+  .scene .nm{font-weight:700;font-size:14px}
+  .scene .ds{font-size:11px;color:var(--muted);margin-top:3px}
+  /* ---------- option cards ---------- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .opt{border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;cursor:pointer;
+    display:flex;align-items:flex-start;gap:12px;background:#fff;transition:.12s;position:relative}
+  .opt:hover{border-color:var(--gold)}
+  .opt.on{border-color:var(--gold);background:#fbf7ee;box-shadow:0 0 0 3px rgba(200,169,106,.15)}
+  .opt .mark{width:22px;height:22px;border-radius:7px;border:2px solid #cbbf9e;flex:0 0 auto;
+    margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:.12s}
+  .opt.on .mark{background:var(--gold);border-color:var(--gold)}
+  .opt.radio .mark{border-radius:50%}
+  .opt .body{min-width:0;flex:1}
+  .opt .nm{font-weight:700;font-size:14.5px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .opt .nm .pr{color:var(--gold-d);font-weight:700;font-size:13px;white-space:nowrap}
+  .opt .ds{font-size:12px;color:var(--muted);margin-top:2px}
+  .badge{display:inline-block;background:var(--navy);color:var(--gold);font-size:10px;
+    font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .opt .nm .lbl{flex:1;min-width:0}
+  .opt.off{opacity:.62;background:#f7f6f2;border-style:dashed}
+  .opt.off .mark{background:#fff;border-color:#cbbf9e;color:var(--muted)}
+  .opt.off .lbl{text-decoration:line-through;color:var(--muted)}
+  .opt.off .pr{color:var(--muted)!important}
+  .hint{font-size:12.5px;color:var(--gold-d);background:#fbf7ee;border:1px dashed var(--gold);
+    border-radius:10px;padding:10px 13px;margin:0 0 14px;font-weight:600}
+  /* ---------- customer & measure ---------- */
+  .cust{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.cust{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:12px;color:var(--muted);font-weight:600}
+  .field input,.field textarea{border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+    font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  .field textarea{resize:vertical;min-height:64px}
+  .measure{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  @media(max-width:680px){.measure{grid-template-columns:repeat(2,1fr)}}
+  .measure .field input{text-align:center}
+  .sumcust{font-size:12.5px;color:#cdd6e6;border:1px solid rgba(255,255,255,.15);
+    border-radius:10px;padding:10px 12px;margin-bottom:12px;min-height:18px}
+  .sumcust b{color:#fff;font-size:14px}
+  /* ---------- wears ---------- */
+  .wears{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .wears input[type=range]{flex:1;min-width:180px;accent-color:var(--gold)}
+  .wears .val{font-weight:800;font-size:22px;color:var(--navy)}
+  /* ---------- summary ---------- */
+  aside{position:sticky;top:96px;align-self:start}
+  @media(max-width:900px){aside{position:static}}
+  .summary{background:var(--navy);color:#fff;border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+  .summary h3{margin:0 0 4px;font-size:14px;color:var(--gold);letter-spacing:.06em}
+  .scenelabel{font-size:13px;color:#cdd6e6;margin-bottom:14px;min-height:18px}
+  .lines{font-size:13.5px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px}
+  .li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:#e7ecf5}
+  .li.dim{color:#9fabc2}
+  .li .x{font-size:12px}
+  .total{border-top:1px solid rgba(255,255,255,.2);margin-top:12px;padding-top:14px}
+  .total .lab{font-size:13px;color:#cdd6e6}
+  .total .amt{font-size:34px;font-weight:800;letter-spacing:.01em;line-height:1.1}
+  .total .amt small{font-size:15px;font-weight:600;color:#cdd6e6;margin-left:4px}
+  .total .tax{font-size:11px;color:#9fabc2}
+  .cpw{background:rgba(200,169,106,.16);border:1px solid rgba(200,169,106,.4);border-radius:12px;
+    padding:12px 14px;margin-top:16px;font-size:13px}
+  .cpw b{font-size:20px;color:var(--gold);font-weight:800}
+  .meta{display:flex;gap:10px;margin-top:14px;font-size:11.5px;color:#cdd6e6;flex-wrap:wrap}
+  .meta div{background:rgba(255,255,255,.08);border-radius:9px;padding:8px 11px;flex:1;text-align:center;min-width:90px}
+  .meta div b{display:block;color:#fff;font-size:14px;margin-top:2px}
+  .btns{display:flex;gap:10px;margin-top:16px}
+  .btn{flex:1;border:none;border-radius:11px;padding:13px;font-size:13.5px;font-weight:700;cursor:pointer}
+  .btn.print{background:var(--gold);color:var(--navy)}
+  .btn.print:hover{background:#d8bd87}
+  .btn.reset{background:rgba(255,255,255,.12);color:#fff}
+  .btn.reset:hover{background:rgba(255,255,255,.2)}
+  .pitch{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:20px;
+    box-shadow:var(--shadow);font-size:13px}
+  .pitch h4{margin:0 0 8px;font-size:13px;color:var(--gold-d);letter-spacing:.05em}
+  .pitch ul{margin:0;padding-left:18px;color:#444}
+  .pitch li{margin:5px 0}
+  /* ---------- settings modal ---------- */
+  .modal{position:fixed;inset:0;background:rgba(10,16,30,.55);display:none;align-items:center;
+    justify-content:center;z-index:50;padding:20px}
+  .modal.open{display:flex}
+  .panel{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:22px}
+  .panel h3{margin:0 0 4px;font-size:17px}
+  .panel p.note{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+  .prow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .prow label{font-size:13.5px}
+  .prow input{width:120px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;text-align:right}
+  .prow input[type=text]{text-align:left;width:200px}
+  .panel .pbtns{display:flex;gap:10px;margin-top:18px}
+  .panel .pbtns button{flex:1;padding:12px;border-radius:10px;border:none;font-weight:700;cursor:pointer;font-size:14px}
+  .save{background:var(--navy);color:#fff}
+  .close{background:#eee;color:#333}
+  .ghead{font-size:12px;font-weight:700;color:var(--gold-d);margin:16px 0 4px;letter-spacing:.05em}
+  /* ---------- mobile sticky total ---------- */
+  .mtotal{display:none}
+  @media(max-width:900px){
+    .mtotal{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--navy);
+      color:#fff;padding:12px 18px;align-items:center;justify-content:space-between;
+      box-shadow:0 -4px 18px rgba(0,0,0,.2)}
+    .mtotal .a{font-size:24px;font-weight:800}
+    .mtotal .a small{font-size:13px;color:#cdd6e6}
+    .mtotal button{background:var(--gold);color:var(--navy);border:none;border-radius:10px;
+      padding:11px 18px;font-weight:700;font-size:13px}
+  }
+  @media print{
+    header,aside .btns,.gear,.mtotal,.pitch{display:none}
+    body{background:#fff}.wrap{display:block}
+    .summary{background:#fff;color:#000;border:1px solid #000}
+    .summary h3,.cpw b,.total .amt{color:#000}
+    .li,.scenelabel,.total .lab,.meta{color:#333}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">👔</div>
+    <div>
+      <h1>オーダースーツ お見積りシミュレーター</h1>
+      <span class="shop" id="shopName" title="クリックで店名を編集">＋ あなたのお店の名前を設定</span>
+    </div>
+  </div>
+  <button class="gear" id="openSettings">⚙ 価格設定</button>
+</header>
+
+<div class="wrap">
+  <!-- ====== main ====== -->
+  <main>
+    <section class="step">
+      <div class="steptag"><b>1</b>SCENE</div>
+      <h2 class="t">どんな場面で着られますか？</h2>
+      <p class="sub">場面を選ぶと、おすすめの仕様が自動でセットされます。そこから自由に調整できます。</p>
+      <div class="scenes" id="scenes"></div>
+    </section>
+
+    <section class="step">
+      <div class="steptag"><b>2</b>FABRIC</div>
+      <h2 class="t">生地グレード</h2>
+      <p class="sub">最初から人気の上質グレードをご提案しています。お好みで変更できます。</p>
+      <div class="grid2" id="fabrics"></div>
+    </section>
+
+    <section class="step">
+      <div class="steptag"><b>3</b>SET</div>
+      <h2 class="t">アイテム構成</h2>
+      <p class="sub">ジャケット＋パンツが基本。ベストを加えると一気に格上の「スリーピース」に。</p>
+      <div class="hint">✓ おすすめ構成が最初から入っています。不要な項目はタップで外せます。</div>
+      <div class="grid2" id="items"></div>
+    </section>
+
+    <section class="step">
+      <div class="steptag"><b>4</b>DETAIL</div>
+      <h2 class="t">仕立て・オプション</h2>
+      <p class="sub">既製品では選べない、細部のこだわり。ここが“自分だけの一着”の差になります。</p>
+      <div class="hint">✓ すべて込みのおすすめ仕様です。外すと、その分お安くなります。</div>
+      <div class="grid2" id="options"></div>
+    </section>
+
+    <section class="step">
+      <div class="steptag"><b>5</b>VALUE</div>
+      <h2 class="t">どれくらい着る予定ですか？</h2>
+      <p class="sub">着る回数で「1回あたりのコスト」が見えます。良い一着ほど、実は割安です。</p>
+      <div class="wears">
+        <span style="font-size:13px;color:var(--muted)">少ない</span>
+        <input type="range" id="wears" min="5" max="200" step="5" value="40">
+        <span style="font-size:13px;color:var(--muted)">多い</span>
+        <span class="val"><span id="wearsVal">40</span><span style="font-size:13px;color:var(--muted)">回/年想定</span></span>
+      </div>
+    </section>
+    <section class="step" id="custSection">
+      <div class="steptag"><b>6</b>CUSTOMER</div>
+      <h2 class="t">お客様情報・採寸メモ</h2>
+      <p class="sub">お見積りに印字されます。採寸値はサイズ控えとしての保管にもどうぞ。</p>
+      <div class="cust">
+        <div class="field"><label>お名前</label><input id="c_name" placeholder="山田 太郎"></div>
+        <div class="field"><label>お見積り日</label><input id="c_date" type="date"></div>
+        <div class="field"><label>ご利用シーン / イベント日</label><input id="c_event" placeholder="例）結婚式 2026/10/12"></div>
+        <div class="field"><label>ご連絡先（任意）</label><input id="c_tel" placeholder="090-1234-5678"></div>
+      </div>
+      <div class="measure">
+        <div class="field"><label>身長 (cm)</label><input id="m_h" inputmode="decimal"></div>
+        <div class="field"><label>体重 (kg)</label><input id="m_w" inputmode="decimal"></div>
+        <div class="field"><label>肩幅 (cm)</label><input id="m_shoulder" inputmode="decimal"></div>
+        <div class="field"><label>胸囲 B (cm)</label><input id="m_bust" inputmode="decimal"></div>
+        <div class="field"><label>胴囲 W (cm)</label><input id="m_waist" inputmode="decimal"></div>
+        <div class="field"><label>ヒップ (cm)</label><input id="m_hip" inputmode="decimal"></div>
+        <div class="field"><label>袖丈 (cm)</label><input id="m_sleeve" inputmode="decimal"></div>
+        <div class="field"><label>着丈 (cm)</label><input id="m_length" inputmode="decimal"></div>
+        <div class="field"><label>股下 (cm)</label><input id="m_inseam" inputmode="decimal"></div>
+        <div class="field"><label>もも周り (cm)</label><input id="m_thigh" inputmode="decimal"></div>
+        <div class="field"><label>首回り (cm)</label><input id="m_neck" inputmode="decimal"></div>
+        <div class="field"><label>裄丈 (cm)</label><input id="m_yuki" inputmode="decimal"></div>
+      </div>
+      <div class="field" style="margin-top:14px"><label>補正・ご要望メモ</label><textarea id="c_memo" placeholder="例）右肩が下がり気味／少しゆったりめ希望／ボタン位置 など"></textarea></div>
+    </section>
+  </main>
+
+  <!-- ====== summary ====== -->
+  <aside>
+    <div class="summary" id="summaryBox">
+      <h3>お見積りサマリー</h3>
+      <div class="sumcust" id="sumCust">お客様情報は未入力です</div>
+      <div class="scenelabel" id="sceneLabel">場面を選んでください</div>
+      <div class="lines" id="lines"></div>
+      <div class="total">
+        <div class="lab">合計（税込）</div>
+        <div class="amt">¥<span id="totalInc">0</span></div>
+        <div class="tax">税抜 ¥<span id="totalEx">0</span> ／ 消費税 ¥<span id="taxAmt">0</span></div>
+      </div>
+      <div class="cpw">
+        🕒 1回あたり <b>¥<span id="cpw">0</span></b> でずっと着られます<br>
+        <span style="font-size:11.5px;color:#cdd6e6">（年<span id="cpwWears">40</span>回 × 3年 = <span id="cpwTotal">120</span>回 で計算）</span>
+      </div>
+      <div class="meta">
+        <div>納期目安<b id="lead">約3〜4週間</b></div>
+        <div>お直し<b>サイズ保証</b></div>
+        <div>採寸<b>20項目以上</b></div>
+      </div>
+      <div class="btns">
+        <button class="btn print" onclick="window.print()">🖨 印刷 / PDF保存</button>
+        <button class="btn reset" id="resetBtn">リセット</button>
+      </div>
+    </div>
+
+    <div class="pitch" id="pitchBox">
+      <h4>＼ この場面でのおすすめポイント ／</h4>
+      <ul id="pitchList"><li>上の「場面」を選ぶと、提案トークが表示されます。</li></ul>
+    </div>
+  </aside>
+</div>
+
+<!-- mobile sticky total -->
+<div class="mtotal">
+  <div class="a">¥<span id="mTotal">0</span><small> 税込</small></div>
+  <button onclick="window.print()">見積りを保存</button>
+</div>
+
+<!-- settings modal -->
+<div class="modal" id="settings">
+  <div class="panel">
+    <h3>価格設定</h3>
+    <p class="note">あなたのお店の実際の料金に書き換えてください。この端末に自動保存され、次回も反映されます。</p>
+    <div class="prow">
+      <label>お店の名前</label>
+      <input type="text" id="set_shop" placeholder="例）Tailor LASTBET">
+    </div>
+    <div class="prow">
+      <label>納期目安（テキスト）</label>
+      <input type="text" id="set_lead" placeholder="約3〜4週間">
+    </div>
+    <div class="prow">
+      <label>消費税率（％）</label>
+      <input type="number" id="set_tax" min="0" max="30" step="1">
+    </div>
+    <div class="ghead">生地グレード（税抜・本体価格）</div>
+    <div id="set_fabrics"></div>
+    <div class="ghead">アイテム追加（税抜）</div>
+    <div id="set_items"></div>
+    <div class="ghead">オプション（税抜）</div>
+    <div id="set_options"></div>
+    <div class="pbtns">
+      <button class="save" id="saveSettings">保存する</button>
+      <button class="close" id="closeSettings">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== 価格・データ（編集可） ===================== */
+const DEFAULTS = {
+  shop:"", lead:"約3〜4週間", tax:10,
+  fabrics:[
+    {id:"entry",   name:"エントリー", sub:"国産ウール",        price:39800, ds:"初めての一着・コスパ重視"},
+    {id:"standard",name:"スタンダード",sub:"インポート生地",   price:59800, ds:"毎日のビジネスに最適な定番"},
+    {id:"premium", name:"プレミアム", sub:"伊・英 高級生地",   price:89800, ds:"特別な日にふさわしい上質な艶感", rec:true},
+    {id:"luxury",  name:"ラグジュアリー",sub:"ブランド生地",    price:139800,ds:"Zegna / Loro Piana 等 最高級"},
+  ],
+  items:[
+    {id:"vest",  name:"ベスト追加（スリーピース化）", price:15000, ds:"一着で“きちんと感”が格段にアップ"},
+    {id:"pants2",name:"替えパンツ（2本目）",          price:12000, ds:"傷みやすいパンツを長持ちさせる"},
+  ],
+  options:[
+    {id:"lining", name:"こだわりの裏地（背抜観音）",   price:3000, ds:"脱いだ時に映える、自分だけの差し色"},
+    {id:"button", name:"本水牛ボタン",                price:2000, ds:"天然素材ならではの上品な艶"},
+    {id:"amf",    name:"AMF（手縫い風）ステッチ",      price:3000, ds:"襟・ラペルに立体感と高級感"},
+    {id:"name",   name:"ネーム刺繍",                  price:1000, ds:"内ポケットにお名前や記念日を"},
+    {id:"surgeon",name:"本切羽（袖ボタンが開く）",     price:2000, ds:"“仕立ての証”。分かる人に伝わる"},
+    {id:"frame",  name:"額縁仕立て・パイピング",       price:2000, ds:"内側まで美しい丁寧な仕上げ"},
+    {id:"canvas", name:"高級総毛芯",                  price:8000, ds:"体に沿って立体的に。型崩れしにくく一生モノの仕立て"},
+    {id:"rdiver", name:"身返しRダイバ",               price:3000, ds:"ポケット周りの切り替えを美しいR（曲線）に。クラシカルで優雅な仕様"},
+    {id:"change", name:"チェンジポケット",            price:2000, ds:"右脇のサブポケット。英国調の粋なディテール"},
+    {id:"handhole",name:"衿穴の手穴（ハンドステッチ）", price:3000, ds:"ラペルのフラワーホールを手縫いで。胸元に職人技が映える上質な仕上げ"},
+  ]
+};
+
+/* シーン別プリセット（生地ID・ONにする項目・着用回数・トーク） */
+const SCENES = [
+  {id:"wedding", emj:"💍", nm:"結婚式・新郎", ds:"主役/参列",
+    fabric:"premium", on:["vest","lining","button","name"], wears:25,
+    label:"結婚式・フォーマルの主役にふさわしい一着",
+    pitch:[
+      "一生の記念。写真にずっと残るからこそ、生地の艶とフィット感で差が出ます。",
+      "ベスト付きのスリーピースは、ジャケットを脱いでも華やかでだらしなく見えません。",
+      "内側のネーム刺繍に挙式日を入れると、世界に一つの記念の一着になります。",
+      "式の後はビジネスや二次会にも着回せて、レンタルより結果的にお得です。"]},
+  {id:"job", emj:"🎓", nm:"就活・新社会人", ds:"第一印象",
+    fabric:"standard", on:[], wears:120,
+    label:"清潔感と信頼感で第一印象を勝ち取る一着",
+    pitch:[
+      "面接は最初の数秒が勝負。体に合ったスーツは「きちんとした人」の印象を作ります。",
+      "既製品はどこか借り物っぽく見えがち。サイズが合うだけで自信が変わります。",
+      "毎日着るものだから、替えパンツを足すと長持ちして経済的です。",
+      "無地のネイビー/チャコールなら、入社後もそのまま使えます。"]},
+  {id:"business", emj:"💼", nm:"ビジネス毎日", ds:"勝負服",
+    fabric:"standard", on:["pants2","amf"], wears:150,
+    label:"毎日着るからこそ妥協できない、相棒の一着",
+    pitch:[
+      "週5で着るなら、1回あたりのコストは驚くほど安くなります（下の数字をご覧ください）。",
+      "替えパンツを足すと、傷みやすいパンツを休ませて寿命が約2倍に。",
+      "肩や腹回りのストレスがない一着は、長時間の商談でも疲れません。",
+      "信頼を勝ち取る場面で、“きちんとした人”という印象が武器になります。"]},
+  {id:"ceremony", emj:"🥂", nm:"記念日・式典", ds:"特別な日",
+    fabric:"premium", on:["vest","lining","button","frame"], wears:15,
+    label:"人生の節目を格上げする、特別な一着",
+    pitch:[
+      "叙勲・式典・パーティーなど、“見られる日”は生地の格がそのまま印象になります。",
+      "ベスト＋上質な裏地で、写真に残る華やかさを演出します。",
+      "本水牛ボタンや額縁仕立てなど、近くで見るほど価値が伝わる仕立てです。",
+      "特別な日のための一着は、所有する満足感も格別です。"]},
+];
+
+/* ===================== 状態 ===================== */
+let CFG = load();
+const fullSet = arr => new Set(arr.map(o=>o.id));
+const popularFabric = () => (CFG.fabrics.find(f=>f.rec)||CFG.fabrics[CFG.fabrics.length-1]).id;
+// マイナス方式：最初から人気生地＋全アイテム・全オプション込みでスタート
+const freshState = () => ({ scene:null, fabric:popularFabric(), items:fullSet(CFG.items), options:fullSet(CFG.options), wears:40 });
+let state = freshState();
+
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem("os_cfg")); if(s) return mergeCfg(s);}catch(e){}
+  return structuredClone(DEFAULTS);
+}
+function mergeCfg(s){ // 既存設定を既定にマージ（項目追加にも耐える）
+  const d=structuredClone(DEFAULTS);
+  d.shop=s.shop??d.shop; d.lead=s.lead??d.lead; d.tax=s.tax??d.tax;
+  ["fabrics","items","options"].forEach(k=>{
+    d[k].forEach(o=>{ const m=(s[k]||[]).find(x=>x.id===o.id); if(m&&typeof m.price==="number") o.price=m.price; });
+  });
+  return d;
+}
+function save(){ localStorage.setItem("os_cfg", JSON.stringify(CFG)); }
+const yen = n => n.toLocaleString("ja-JP");
+
+/* ===================== 描画 ===================== */
+function renderScenes(){
+  document.getElementById("scenes").innerHTML = SCENES.map(s=>`
+    <div class="scene ${state.scene===s.id?'on':''}" data-scene="${s.id}">
+      <span class="emj">${s.emj}</span><span class="nm">${s.nm}</span><span class="ds">${s.ds}</span>
+    </div>`).join("");
+}
+function renderFabrics(){
+  document.getElementById("fabrics").innerHTML = CFG.fabrics.map(f=>`
+    <div class="opt radio ${state.fabric===f.id?'on':''}" data-fab="${f.id}">
+      <div class="mark">${state.fabric===f.id?'●':''}</div>
+      <div class="body">
+        <div class="nm">${f.name}${f.rec?'<span class="badge">人気</span>':''}<span class="pr">¥${yen(f.price)}〜</span></div>
+        <div class="ds">${f.sub}｜${f.ds}</div>
+      </div>
+    </div>`).join("");
+}
+function renderItems(){
+  document.getElementById("items").innerHTML = CFG.items.map(i=>{
+    const on=state.items.has(i.id);
+    return `<div class="opt ${on?'on':'off'}" data-item="${i.id}">
+      <div class="mark">${on?'✓':'＋'}</div>
+      <div class="body">
+        <div class="nm"><span class="lbl">${i.name}</span><span class="pr">${on?`¥${yen(i.price)} 込み`:`＋¥${yen(i.price)} 戻す`}</span></div>
+        <div class="ds">${i.ds}</div>
+      </div>
+    </div>`;}).join("");
+}
+function renderOptions(){
+  document.getElementById("options").innerHTML = CFG.options.map(o=>{
+    const on=state.options.has(o.id);
+    return `<div class="opt ${on?'on':'off'}" data-opt="${o.id}">
+      <div class="mark">${on?'✓':'＋'}</div>
+      <div class="body">
+        <div class="nm"><span class="lbl">${o.name}</span><span class="pr">${on?`¥${yen(o.price)} 込み`:`＋¥${yen(o.price)} 戻す`}</span></div>
+        <div class="ds">${o.ds}</div>
+      </div>
+    </div>`;}).join("");
+}
+
+/* ===================== 計算 ===================== */
+function calc(){
+  const f = CFG.fabrics.find(x=>x.id===state.fabric);
+  const lines=[{nm:`${f.name}（${f.sub}）`, amt:f.price}];
+  let sub=f.price;
+  CFG.items.forEach(i=>{ if(state.items.has(i.id)){lines.push({nm:i.name,amt:i.price}); sub+=i.price;} });
+  CFG.options.forEach(o=>{ if(state.options.has(o.id)){lines.push({nm:o.name,amt:o.price}); sub+=o.price;} });
+  const tax=Math.round(sub*CFG.tax/100), inc=sub+tax;
+  return {f,lines,sub,tax,inc};
+}
+function render(){
+  const {lines,sub,tax,inc}=calc();
+  const removed=[...CFG.items,...CFG.options].filter(o=>
+    (CFG.items.includes(o)&&!state.items.has(o.id))||(CFG.options.includes(o)&&!state.options.has(o.id)));
+  document.getElementById("lines").innerHTML =
+    lines.map(l=>`<div class="li"><span class="x">${l.nm}</span><span>¥${yen(l.amt)}</span></div>`).join("")
+    + removed.map(r=>`<div class="li dim"><span class="x">✕ ${r.name}（外しました）</span><span>−¥${yen(r.price)}</span></div>`).join("");
+  document.getElementById("totalInc").textContent=yen(inc);
+  document.getElementById("totalEx").textContent=yen(sub);
+  document.getElementById("taxAmt").textContent=yen(tax);
+  document.getElementById("mTotal").textContent=yen(inc);
+  // 1回あたり：年間想定回数 × 3年
+  const totalWears=state.wears*3;
+  document.getElementById("cpw").textContent=yen(Math.round(inc/totalWears));
+  document.getElementById("cpwWears").textContent=state.wears;
+  document.getElementById("cpwTotal").textContent=totalWears;
+  document.getElementById("lead").textContent=CFG.lead;
+  // scene label & pitch
+  const sc=SCENES.find(s=>s.id===state.scene);
+  document.getElementById("sceneLabel").textContent = sc ? sc.label : "自由にカスタマイズ中";
+  document.getElementById("pitchList").innerHTML = sc
+    ? sc.pitch.map(p=>`<li>${p}</li>`).join("")
+    : "<li>上の「場面」を選ぶと、提案トークが表示されます。</li>";
+}
+function renderAll(){ renderScenes();renderFabrics();renderItems();renderOptions();render(); }
+
+/* ===================== 操作 ===================== */
+function applyScene(id){
+  const s=SCENES.find(x=>x.id===id); if(!s)return;
+  state.scene=id; state.fabric=s.fabric;
+  // マイナス方式：シーンを選んでも“フル装備”からスタートし、不要分を外してもらう
+  state.items=fullSet(CFG.items);
+  state.options=fullSet(CFG.options);
+  state.wears=s.wears;
+  document.getElementById("wears").value=s.wears;
+  document.getElementById("wearsVal").textContent=s.wears;
+  renderAll();
+}
+document.getElementById("scenes").addEventListener("click",e=>{
+  const el=e.target.closest("[data-scene]"); if(el) applyScene(el.dataset.scene);
+});
+document.getElementById("fabrics").addEventListener("click",e=>{
+  const el=e.target.closest("[data-fab]"); if(!el)return; state.fabric=el.dataset.fab; renderFabrics();render();
+});
+document.getElementById("items").addEventListener("click",e=>{
+  const el=e.target.closest("[data-item]"); if(!el)return; const id=el.dataset.item;
+  state.items.has(id)?state.items.delete(id):state.items.add(id); renderItems();render();
+});
+document.getElementById("options").addEventListener("click",e=>{
+  const el=e.target.closest("[data-opt]"); if(!el)return; const id=el.dataset.opt;
+  state.options.has(id)?state.options.delete(id):state.options.add(id); renderOptions();render();
+});
+const wr=document.getElementById("wears");
+wr.addEventListener("input",()=>{ state.wears=+wr.value; document.getElementById("wearsVal").textContent=wr.value; render(); });
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  state=freshState();
+  wr.value=40; document.getElementById("wearsVal").textContent=40;
+  document.querySelectorAll("#custSection input,#custSection textarea").forEach(i=>i.value="");
+  setToday(); updateCust(); renderAll();
+});
+
+/* ===================== 店名 ===================== */
+function showShop(){
+  const el=document.getElementById("shopName");
+  if(CFG.shop){ el.textContent=CFG.shop; el.style.color=""; }
+  else el.textContent="＋ あなたのお店の名前を設定";
+}
+document.getElementById("shopName").addEventListener("click",openSettings);
+
+/* ===================== 設定モーダル ===================== */
+function buildSettings(){
+  document.getElementById("set_shop").value=CFG.shop;
+  document.getElementById("set_lead").value=CFG.lead;
+  document.getElementById("set_tax").value=CFG.tax;
+  const row=(o,k)=>`<div class="prow"><label>${o.name||o.sub?`${o.name}`:''}<span style="color:var(--muted);font-size:11px"> ${o.sub||''}</span></label>
+    <input type="number" data-k="${k}" data-id="${o.id}" value="${o.price}" step="100"></div>`;
+  document.getElementById("set_fabrics").innerHTML=CFG.fabrics.map(o=>row(o,"fabrics")).join("");
+  document.getElementById("set_items").innerHTML=CFG.items.map(o=>row(o,"items")).join("");
+  document.getElementById("set_options").innerHTML=CFG.options.map(o=>row(o,"options")).join("");
+}
+function openSettings(){ buildSettings(); document.getElementById("settings").classList.add("open"); }
+document.getElementById("openSettings").addEventListener("click",openSettings);
+document.getElementById("closeSettings").addEventListener("click",()=>document.getElementById("settings").classList.remove("open"));
+document.getElementById("settings").addEventListener("click",e=>{ if(e.target.id==="settings") e.target.classList.remove("open"); });
+document.getElementById("saveSettings").addEventListener("click",()=>{
+  CFG.shop=document.getElementById("set_shop").value.trim();
+  CFG.lead=document.getElementById("set_lead").value.trim()||"約3〜4週間";
+  CFG.tax=Math.max(0,+document.getElementById("set_tax").value||0);
+  document.querySelectorAll(".panel input[type=number][data-id]").forEach(inp=>{
+    const arr=CFG[inp.dataset.k]; const o=arr.find(x=>x.id===inp.dataset.id);
+    if(o) o.price=Math.max(0,+inp.value||0);
+  });
+  save(); showShop(); renderAll();
+  document.getElementById("settings").classList.remove("open");
+});
+
+/* ===================== お客様情報 ===================== */
+const val = id => (document.getElementById(id)?.value||"").trim();
+const esc = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function updateCust(){
+  const n=val("c_name"), d=val("c_date"), e=val("c_event"), parts=[];
+  if(n) parts.push(`<b>${esc(n)} 様</b>`);
+  if(e) parts.push(esc(e));
+  if(d) parts.push(d.replace(/-/g,"/"));
+  document.getElementById("sumCust").innerHTML = parts.length ? parts.join("　/　") : "お客様情報は未入力です";
+}
+function setToday(){
+  const el=document.getElementById("c_date");
+  if(el && !el.value){ el.value=new Date().toISOString().slice(0,10); }
+}
+document.querySelectorAll("#custSection input,#custSection textarea").forEach(i=>i.addEventListener("input",updateCust));
+
+/* ===================== init ===================== */
+setToday(); updateCust(); showShop(); renderAll();
+</script>
+</body>
+</html>
