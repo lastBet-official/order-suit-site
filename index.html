@@ -58,7 +58,7 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:560px){.grid2{grid-template-columns:1fr}}
   @media(min-width:561px){#fabrics{grid-template-columns:repeat(3,1fr)}}
-  #fabrics .nm .lbl{font-size:17px}
+  #fabrics .nm .lbl{font-size:15px}
   .opt{border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;cursor:pointer;
     display:flex;align-items:flex-start;gap:12px;background:#fff;transition:.12s;position:relative}
   .opt:hover{border-color:var(--gold)}
@@ -325,9 +325,9 @@
 const DEFAULTS = {
   shop:"", lead:"約3〜4週間", tax:10,
   fabrics:[
-    {id:"ume",  name:"梅", sub:"スタンダード生地",   price:69000,  ds:"上質さと手頃さのバランスが取れた一着"},
-    {id:"take", name:"竹", sub:"高級インポート生地", price:118000, ds:"特別な日にふさわしい上質な艶感", rec:true},
-    {id:"matsu",name:"松", sub:"最高級ブランド生地", price:158000, ds:"Zegna / Loro Piana 等 最上位グレード"},
+    {id:"ume",  name:"エントリーライン", sub:"スタンダード生地",   price:69000,  ds:"上質さと手頃さのバランスが取れた一着"},
+    {id:"take", name:"プレミアムライン", sub:"高級インポート生地", price:118000, ds:"特別な日にふさわしい上質な艶感", rec:true},
+    {id:"matsu",name:"ラグジュアリーライン", sub:"最高級ブランド生地", price:158000, ds:"Zegna / Loro Piana 等 最上位グレード"},
   ],
   items:[
     {id:"vest",  name:"ベスト追加（スリーピース化）", price:15000, ds:"一着で“きちんと感”が格段にアップ"},
