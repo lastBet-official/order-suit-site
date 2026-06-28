@@ -57,6 +57,8 @@
   /* ---------- option cards ---------- */
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  @media(min-width:561px){#fabrics{grid-template-columns:repeat(3,1fr)}}
+  #fabrics .nm .lbl{font-size:17px}
   .opt{border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;cursor:pointer;
     display:flex;align-items:flex-start;gap:12px;background:#fff;transition:.12s;position:relative}
   .opt:hover{border-color:var(--gold)}
@@ -323,10 +325,9 @@
 const DEFAULTS = {
   shop:"", lead:"約3〜4週間", tax:10,
   fabrics:[
-    {id:"entry",   name:"エントリー", sub:"国産ウール",        price:39800, ds:"初めての一着・コスパ重視"},
-    {id:"standard",name:"スタンダード",sub:"インポート生地",   price:59800, ds:"毎日のビジネスに最適な定番"},
-    {id:"premium", name:"プレミアム", sub:"伊・英 高級生地",   price:89800, ds:"特別な日にふさわしい上質な艶感", rec:true},
-    {id:"luxury",  name:"ラグジュアリー",sub:"ブランド生地",    price:139800,ds:"Zegna / Loro Piana 等 最高級"},
+    {id:"ume",  name:"梅", sub:"スタンダード生地",   price:69000,  ds:"上質さと手頃さのバランスが取れた一着"},
+    {id:"take", name:"竹", sub:"高級インポート生地", price:118000, ds:"特別な日にふさわしい上質な艶感", rec:true},
+    {id:"matsu",name:"松", sub:"最高級ブランド生地", price:158000, ds:"Zegna / Loro Piana 等 最上位グレード"},
   ],
   items:[
     {id:"vest",  name:"ベスト追加（スリーピース化）", price:15000, ds:"一着で“きちんと感”が格段にアップ"},
@@ -349,7 +350,7 @@ const DEFAULTS = {
 /* シーン別プリセット（生地ID・ONにする項目・着用回数・トーク） */
 const SCENES = [
   {id:"wedding", emj:"💍", nm:"結婚式・新郎", ds:"主役/参列",
-    fabric:"premium", on:["vest","lining","button","name"], wears:25,
+    fabric:"matsu", on:["vest","lining","button","name"], wears:25,
     label:"結婚式・フォーマルの主役にふさわしい一着",
     pitch:[
       "一生の記念。写真にずっと残るからこそ、生地の艶とフィット感で差が出ます。",
@@ -357,7 +358,7 @@ const SCENES = [
       "内側のネーム刺繍に挙式日を入れると、世界に一つの記念の一着になります。",
       "式の後はビジネスや二次会にも着回せて、レンタルより結果的にお得です。"]},
   {id:"job", emj:"🎓", nm:"就活・新社会人", ds:"第一印象",
-    fabric:"standard", on:[], wears:120,
+    fabric:"ume", on:[], wears:120,
     label:"清潔感と信頼感で第一印象を勝ち取る一着",
     pitch:[
       "面接は最初の数秒が勝負。体に合ったスーツは「きちんとした人」の印象を作ります。",
@@ -365,7 +366,7 @@ const SCENES = [
       "毎日着るものだから、替えパンツを足すと長持ちして経済的です。",
       "無地のネイビー/チャコールなら、入社後もそのまま使えます。"]},
   {id:"business", emj:"💼", nm:"ビジネス毎日", ds:"勝負服",
-    fabric:"standard", on:["pants2","amf"], wears:150,
+    fabric:"take", on:["pants2","amf"], wears:150,
     label:"毎日着るからこそ妥協できない、相棒の一着",
     pitch:[
       "週5で着るなら、1回あたりのコストは驚くほど安くなります（下の数字をご覧ください）。",
@@ -373,7 +374,7 @@ const SCENES = [
       "肩や腹回りのストレスがない一着は、長時間の商談でも疲れません。",
       "信頼を勝ち取る場面で、“きちんとした人”という印象が武器になります。"]},
   {id:"ceremony", emj:"🥂", nm:"記念日・式典", ds:"特別な日",
-    fabric:"premium", on:["vest","lining","button","frame"], wears:15,
+    fabric:"matsu", on:["vest","lining","button","frame"], wears:15,
     label:"人生の節目を格上げする、特別な一着",
     pitch:[
       "叙勲・式典・パーティーなど、“見られる日”は生地の格がそのまま印象になります。",
@@ -417,7 +418,7 @@ function renderFabrics(){
     <div class="opt radio ${state.fabric===f.id?'on':''}" data-fab="${f.id}">
       <div class="mark">${state.fabric===f.id?'●':''}</div>
       <div class="body">
-        <div class="nm">${f.name}${f.rec?'<span class="badge">人気</span>':''}<span class="pr">¥${yen(f.price)}〜</span></div>
+        <div class="nm"><span class="lbl">${f.name}${f.rec?'<span class="badge">人気</span>':''}</span><span class="pr">¥${yen(f.price)}〜</span></div>
         <div class="ds">${f.sub}｜${f.ds}</div>
       </div>
     </div>`).join("");
